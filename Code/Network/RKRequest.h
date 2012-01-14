@@ -95,6 +95,14 @@ typedef enum {
 /**
  Models the request portion of an HTTP request/response cycle.
  */
+@class RKRequest, RKObjectLoader;
+
+typedef void(^RKCompletionBlock)(RKRequest *, RKResponse *);
+typedef void(^RKFailureBlock)(RKRequest *, NSError *);
+
+typedef void(^RKObjectCompletionBlock)(RKObjectLoader *, NSArray *objects);
+typedef void(^RKObjectFailureBlock)(RKObjectLoader *, NSError *);
+
 @interface RKRequest : NSObject {
 	NSURL *_URL;
 	NSMutableURLRequest *_URLRequest;
@@ -121,6 +129,8 @@ typedef enum {
     NSTimeInterval _cacheTimeoutInterval;
     RKRequestQueue *_queue;
     RKReachabilityObserver *_reachabilityObserver;
+  RKCompletionBlock _completionBlock;
+  RKFailureBlock _failureBlock;
     
     #if TARGET_OS_IPHONE
     RKRequestBackgroundPolicy _backgroundPolicy;
@@ -312,6 +322,9 @@ typedef enum {
  * includes RKRequestCachePolicyTimeout
  */
 @property (nonatomic, assign) NSTimeInterval cacheTimeoutInterval;
+
+@property (nonatomic, copy) RKCompletionBlock completionBlock;
+@property (nonatomic, copy) RKFailureBlock failureBlock;
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////

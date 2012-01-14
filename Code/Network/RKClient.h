@@ -152,7 +152,8 @@ NSString *RKPathAppendQueryParams(NSString *resourcePath, NSDictionary *queryPar
  @see RKRequestQueue
  @see RKRequestSerializable
  */
-@interface RKClient : NSObject {
+
+@interface RKClient : NSObject <RKRequestDelegate> {
 	NSString *_baseURL;
     RKRequestAuthenticationType _authenticationType;
 	NSString *_username;
@@ -576,9 +577,11 @@ NSString *RKPathAppendQueryParams(NSString *resourcePath, NSDictionary *queryPar
  
  @param resourcePath The resourcePath to target the request at
  @param delegate A delegate object to inform of the results
+ @param completionBlock A block that is executed on the completion of the request
  @return The RKRequest object built and sent to the remote system
  */
 - (RKRequest *)get:(NSString *)resourcePath delegate:(NSObject<RKRequestDelegate> *)delegate;
+- (RKRequest *)get:(NSString *)resourcePath completionBlock:(RKCompletionBlock)completionBlock failureBlock:(RKFailureBlock)failureBlock;
 
 /**
  Fetch a resource via an HTTP GET with a dictionary of params
@@ -589,9 +592,11 @@ NSString *RKPathAppendQueryParams(NSString *resourcePath, NSDictionary *queryPar
  @param resourcePath The resourcePath to target the request at
  @param queryParams A dictionary of query parameters to append to the resourcePath. Assumes that resourcePath does not contain a query string.
  @param delegate A delegate object to inform of the results
+ @param completionBlock A block that is executed on the completion of the request
  @return The RKRequest object built and sent to the remote system
  */
 - (RKRequest *)get:(NSString *)resourcePath queryParams:(NSDictionary *)queryParams delegate:(NSObject<RKRequestDelegate> *)delegate;
+- (RKRequest *)get:(NSString *)resourcePath queryParams:(NSDictionary *)queryParams completionBlock:(RKCompletionBlock)completionBlock failureBlock:(RKFailureBlock)failureBlock;
 
 /**
  Create a resource via an HTTP POST with a set of form parameters
@@ -599,10 +604,12 @@ NSString *RKPathAppendQueryParams(NSString *resourcePath, NSDictionary *queryPar
  @param resourcePath The resourcePath to target the request at
  @param params A RKRequestSerializable object to use as the body of the request
  @param delegate A delegate object to inform of the results
+ @param completionBlock A block that is executed on the completion of the request
  @return The RKRequest object built and sent to the remote system
  @see RKRequestSerializable
  */
 - (RKRequest *)post:(NSString *)resourcePath params:(NSObject<RKRequestSerializable> *)params delegate:(NSObject<RKRequestDelegate> *)delegate;
+- (RKRequest *)post:(NSString *)resourcePath params:(NSObject<RKRequestSerializable> *)params completionBlock:(RKCompletionBlock)completionBlock failureBlock:(RKFailureBlock)failureBlock;
 
 /**
  Update a resource via an HTTP PUT
@@ -610,18 +617,21 @@ NSString *RKPathAppendQueryParams(NSString *resourcePath, NSDictionary *queryPar
  @param resourcePath The resourcePath to target the request at
  @param params A RKRequestSerializable object to use as the body of the request
  @param delegate A delegate object to inform of the results
+ @param completionBlock A block that is executed on the completion of the request
  @return The RKRequest object built and sent to the remote system
  @see RKRequestSerializable
  */
 - (RKRequest *)put:(NSString *)resourcePath params:(NSObject<RKRequestSerializable> *)params delegate:(NSObject<RKRequestDelegate> *)delegate;
-
+- (RKRequest *)put:(NSString *)resourcePath params:(NSObject<RKRequestSerializable> *)params completionBlock:(RKCompletionBlock)completionBlock failureBlock:(RKFailureBlock)failureBlock;
 /**
  Destroy a resource via an HTTP DELETE
  
  @param resourcePath The resourcePath to target the request at
  @param delegate A delegate object to inform of the results
+ @param completionBlock A block that is executed on the completion of the request
  @return The RKRequest object built and sent to the remote system
  */
 - (RKRequest *)delete:(NSString *)resourcePath delegate:(NSObject<RKRequestDelegate> *)delegate;
+- (RKRequest *)delete:(NSString *)resourcePath completionBlock:(RKCompletionBlock)completionBlock failureBlock:(RKFailureBlock)failureBlock;
 
 @end

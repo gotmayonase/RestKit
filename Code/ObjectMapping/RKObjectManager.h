@@ -105,7 +105,7 @@ typedef enum {
  When an instance of RKObjectManager is configured, the RKObjectMappingProvider
  instance configured 
  */
-@interface RKObjectManager : NSObject {
+@interface RKObjectManager : NSObject <RKObjectLoaderDelegate> {
 	RKClient* _client;
 	RKObjectRouter* _router;
 	RKManagedObjectStore* _objectStore;	
@@ -222,11 +222,13 @@ typedef enum {
  set on the mapping provider.
  */
 - (RKObjectLoader*)loadObjectsAtResourcePath:(NSString*)resourcePath delegate:(id<RKObjectLoaderDelegate>)delegate;
+- (RKObjectLoader*)loadObjectsAtResourcePath:(NSString *)resourcePath completionBlock:(RKObjectCompletionBlock)completionBlock failureBlock:(RKObjectFailureBlock)failureBlock;
 
 /**
  Load mappable objects at the specified resourcePath using the specified object mapping.
  */
 - (RKObjectLoader*)loadObjectsAtResourcePath:(NSString*)resourcePath objectMapping:(RKObjectMapping*)objectMapping delegate:(id<RKObjectLoaderDelegate>)delegate;
+- (RKObjectLoader*)loadObjectsAtResourcePath:(NSString *)resourcePath objectMapping:(RKObjectMapping *)objectMapping completionBlock:(RKObjectCompletionBlock)completionBlock failureBlock:(RKObjectFailureBlock)failureBlock;
 
 ////////////////////////////////////////////////////////
 /// @name Mappable Object Loaders

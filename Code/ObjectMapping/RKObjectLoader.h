@@ -186,6 +186,9 @@
  */
 @property (nonatomic, retain) NSObject* targetObject;
 
+@property (nonatomic, copy) RKObjectCompletionBlock objectCompletionBlock;
+@property (nonatomic, copy) RKObjectFailureBlock objectFailureBlock;
+
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 /**

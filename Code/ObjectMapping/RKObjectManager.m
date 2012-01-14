@@ -158,14 +158,50 @@ static RKObjectManager* sharedManager = nil;
 	return loader;
 }
 
+- (RKObjectLoader *)loadObjectsAtResourcePath:(NSString *)resourcePath completionBlock:(RKObjectCompletionBlock)completionBlock failureBlock:(RKObjectFailureBlock)failureBlock {
+  RKObjectLoader *loader = [self objectLoaderWithResourcePath:resourcePath delegate:self];
+  loader.method = RKRequestMethodGET;
+  loader.objectCompletionBlock = completionBlock;
+  loader.objectFailureBlock = failureBlock;
+  [loader send];
+  
+  return loader;
+}
+
 - (RKObjectLoader*)loadObjectsAtResourcePath:(NSString*)resourcePath objectMapping:(RKObjectMapping*)objectMapping delegate:(id<RKObjectLoaderDelegate>)delegate {
 	RKObjectLoader* loader = [self objectLoaderWithResourcePath:resourcePath delegate:delegate];
 	loader.method = RKRequestMethodGET;
-    loader.objectMapping = objectMapping;
+  loader.objectMapping = objectMapping;
 
 	[loader send];
 
 	return loader;
+}
+
+- (RKObjectLoader *)loadObjectsAtResourcePath:(NSString *)resourcePath objectMapping:(RKObjectMapping *)objectMapping completionBlock:(RKObjectCompletionBlock)completionBlock failureBlock:(RKObjectFailureBlock)failureBlock {
+	RKObjectLoader* loader = [self objectLoaderWithResourcePath:resourcePath delegate:self];
+	loader.method = RKRequestMethodGET;
+  loader.objectMapping = objectMapping;
+  loader.objectCompletionBlock = completionBlock;
+  loader.objectFailureBlock = failureBlock;
+  
+	[loader send];
+  
+	return loader;
+}
+
+#pragma mark - RKObjectLoaderDelegate methods
+
+- (void)objectLoader:(RKObjectLoader *)objectLoader didLoadObjects:(NSArray *)objects {
+  objectLoader.objectCompletionBlock(objectLoader, objects);
+}
+
+- (void)objectLoader:(RKObjectLoader *)objectLoader didFailWithError:(NSError *)error {
+  objectLoader.objectFailureBlock(objectLoader, error);
+}
+
+- (void)objectLoaderDidLoadUnexpectedResponse:(RKObjectLoader *)objectLoader {
+  objectLoader.objectFailureBlock(objectLoader, nil);
 }
 
 /////////////////////////////////////////////////////////////

@@ -62,6 +62,8 @@
 @synthesize OAuth2RefreshToken = _OAuth2RefreshToken;
 @synthesize queue = _queue;
 @synthesize reachabilityObserver = _reachabilityObserver;
+@synthesize completionBlock = _completionBlock;
+@synthesize failureBlock = _failureBlock;
 
 #if TARGET_OS_IPHONE
 @synthesize backgroundPolicy = _backgroundPolicy, backgroundTaskIdentifier = _backgroundTaskIdentifier;
@@ -560,7 +562,7 @@
   	_isLoaded = YES;
     
     RKLogInfo(@"Status Code: %ld", (long) [response statusCode]);
-    RKLogDebug(@"Body: %@", [response bodyAsString]);
+    RKLogInfo(@"Body: %@", [response bodyAsString]);
 
 	RKResponse* finalResponse = response;
 
