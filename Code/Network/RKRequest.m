@@ -546,6 +546,10 @@
 		if ([_delegate respondsToSelector:@selector(request:didFailLoadWithError:)]) {
 			[_delegate request:self didFailLoadWithError:error];
 		}
+    
+    if (self.failureBlock != nil && self.delegate == nil) {
+      self.failureBlock(self, error);
+    }
         
         NSDictionary* userInfo = [NSDictionary dictionaryWithObject:error forKey:RKRequestDidFailWithErrorNotificationUserInfoErrorKey];
 		[[NSNotificationCenter defaultCenter] postNotificationName:RKRequestDidFailWithErrorNotification 
@@ -593,6 +597,9 @@
     [[NSNotificationCenter defaultCenter] postNotificationName:RKRequestDidLoadResponseNotification 
                                                         object:self 
                                                       userInfo:userInfo];
+  if (self.completionBlock != nil && self.delegate == nil) {
+    self.completionBlock(self, finalResponse);
+  }
 }
 
 - (BOOL)isGET {
