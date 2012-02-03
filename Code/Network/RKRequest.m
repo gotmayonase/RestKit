@@ -202,6 +202,9 @@
     
     // Cleanup a background task if there is any
     [self cleanupBackgroundTask];
+  
+  self.completionBlock = nil;
+  self.failureBlock = nil;
      
     [super dealloc];
 }

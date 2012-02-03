@@ -78,6 +78,9 @@
     _result = nil;
     [_serializationMIMEType release];
     [_serializationMapping release];
+  
+  self.objectCompletionBlock = nil;
+  self.objectFailureBlock = nil;
     
 	[super dealloc];
 }
