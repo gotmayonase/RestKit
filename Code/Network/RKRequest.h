@@ -131,6 +131,7 @@ typedef void(^RKObjectFailureBlock)(RKObjectLoader *, NSError *);
     RKReachabilityObserver *_reachabilityObserver;
   RKCompletionBlock _completionBlock;
   RKFailureBlock _failureBlock;
+    NSTimer *_timeoutTimer;
     
     #if TARGET_OS_IPHONE
     RKRequestBackgroundPolicy _backgroundPolicy;
@@ -192,6 +193,14 @@ typedef void(^RKObjectFailureBlock)(RKObjectLoader *, NSError *);
  The request queue that this request belongs to
  */
 @property (nonatomic, assign) RKRequestQueue *queue;
+
+/**
+ * The timeout interval within which the request should be cancelled
+ * if no data has been received
+ *
+ * @default 120.0
+ */
+@property (nonatomic, assign) NSTimeInterval timeoutInterval;
 
 /**
  * The policy to take on transition to the background (iOS 4.x and higher only)
@@ -394,6 +403,24 @@ typedef void(^RKObjectFailureBlock)(RKObjectLoader *, NSError *);
 - (void)cancel;
 
 /**
+ * Creates a timeoutTimer to trigger the timeout method
+ * This is mainly used so we can test that the timer is only being created once.
+ */
+- (void)createTimeoutTimer;
+
+/**
+ * Cancels request due to connection timeout exceeded.
+ * This will return an RKRequestConnectionTimeoutError via didFailLoadWithError:
+ */
+- (void)timeout;
+
+/**
+ * Invalidates the timeout timer.
+ * Called by RKResponse when the NSURLConnection begins receiving data.
+ */
+- (void)invalidateTimeoutTimer;
+
+/**
  * Returns YES when this is a GET request
  */
 - (BOOL)isGET;
@@ -481,10 +508,5 @@ typedef void(^RKObjectFailureBlock)(RKObjectLoader *, NSError *);
  * backgrounded request expired before completion.
  */
 - (void)requestDidTimeout:(RKRequest *)request;
-
-/**
- * Sent when a request fails authentication
- */
-- (void)request:(RKRequest *)request didFailAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge;
 
 @end

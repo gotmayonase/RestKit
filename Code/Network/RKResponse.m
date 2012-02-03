@@ -51,7 +51,9 @@ extern NSString* cacheURLKey;
 - (id)initWithRequest:(RKRequest*)request {
     self = [self init];
 	if (self) {
-		_request = [request retain];
+		// We don't retain here as we're letting RKRequestQueue manage
+		// request ownership
+		_request = request;
 	}
 
 	return self;
@@ -71,7 +73,7 @@ extern NSString* cacheURLKey;
 - (id)initWithSynchronousRequest:(RKRequest*)request URLResponse:(NSHTTPURLResponse*)URLResponse body:(NSData*)body error:(NSError*)error {
     self = [super init];
 	if (self) {
-		_request = [request retain];
+		_request = request;
 		_httpURLResponse = [URLResponse retain];
 		_failureError = [error retain];
         _body = [[NSMutableData dataWithData:body] retain];
@@ -82,8 +84,6 @@ extern NSString* cacheURLKey;
 }
 
 - (void)dealloc {
-	[_request release];
-	_request = nil;
 	[_httpURLResponse release];
 	_httpURLResponse = nil;
 	[_body release];
@@ -151,11 +151,8 @@ extern NSString* cacheURLKey;
 		[[challenge sender] useCredential:newCredential
 		       forAuthenticationChallenge:challenge];
 	} else {
-	    RKLogWarning(@"Failed authentication challenge after %ld failures", (long) [challenge previousFailureCount]);		
-        if ([[_request delegate] respondsToSelector:@selector(request:didFailAuthenticationChallenge:)]) {
-            [[_request delegate] request:_request didFailAuthenticationChallenge:challenge];
- 		}
-        [[challenge sender] cancelAuthenticationChallenge:challenge];
+	    RKLogWarning(@"Failed authentication challenge after %ld failures", (long) [challenge previousFailureCount]);
+		[[challenge sender] cancelAuthenticationChallenge:challenge];
 	}
 }
 
@@ -183,6 +180,7 @@ extern NSString* cacheURLKey;
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
 	[_body appendData:data];
+    [_request invalidateTimeoutTimer];
     if ([[_request delegate] respondsToSelector:@selector(request:didReceivedData:totalBytesReceived:totalBytesExectedToReceive:)]) {
         [[_request delegate] request:_request didReceivedData:[data length] totalBytesReceived:[_body length] totalBytesExectedToReceive:_httpURLResponse.expectedContentLength];
     }
@@ -192,6 +190,7 @@ extern NSString* cacheURLKey;
     RKLogDebug(@"NSHTTPURLResponse Status Code: %ld", (long) [response statusCode]);
     RKLogDebug(@"Headers: %@", [response allHeaderFields]);
 	_httpURLResponse = [response retain];
+    [_request invalidateTimeoutTimer];
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
@@ -200,8 +199,9 @@ extern NSString* cacheURLKey;
 }
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
-	_failureError = [error retain];
-	[_request didFailLoadWithError:_failureError];
+    _failureError = [error retain];
+    [_request invalidateTimeoutTimer];
+    [_request didFailLoadWithError:_failureError];
 }
 
 - (NSInputStream *)connection:(NSURLConnection *)connection needNewBodyStream:(NSURLRequest *)request {
