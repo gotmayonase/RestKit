@@ -161,6 +161,27 @@
     _username = nil;
     [_password release];
     _password = nil;
+    
+  	self.delegate = nil;
+  self.completionBlock = nil;
+  self.failureBlock = nil;
+  	[_connection cancel];
+  	[_connection release];
+  	_connection = nil;
+  	[_userData release];
+  	_userData = nil;
+  	[_URL release];
+  	_URL = nil;
+  	[_URLRequest release];
+  	_URLRequest = nil;
+  	[_params release];
+  	_params = nil;    
+  	[_additionalHTTPHeaders release];
+  	_additionalHTTPHeaders = nil;
+  	[_username release];
+  	_username = nil;
+  	[_password release];
+  	_password = nil;
     [_cache release];
     _cache = nil;    
     [_OAuth1ConsumerKey release];
@@ -575,6 +596,10 @@
 		if ([_delegate respondsToSelector:@selector(request:didFailLoadWithError:)]) {
 			[_delegate request:self didFailLoadWithError:error];
 		}
+    
+    if (self.failureBlock != nil && self.delegate == nil) {
+      self.failureBlock(self, error);
+    }
         
         NSDictionary* userInfo = [NSDictionary dictionaryWithObject:error forKey:RKRequestDidFailWithErrorNotificationUserInfoErrorKey];
 		[[NSNotificationCenter defaultCenter] postNotificationName:RKRequestDidFailWithErrorNotification 
@@ -622,6 +647,10 @@
     [[NSNotificationCenter defaultCenter] postNotificationName:RKRequestDidLoadResponseNotification 
                                                         object:self 
                                                       userInfo:userInfo];
+  
+  if (self.completionBlock != nil && self.delegate == nil) {
+    self.completionBlock(self, finalResponse);
+  }
 }
 
 - (BOOL)isGET {
