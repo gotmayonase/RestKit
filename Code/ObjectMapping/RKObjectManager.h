@@ -312,6 +312,14 @@ typedef enum {
 - (RKObjectLoader*)postObject:(id<NSObject>)object delegate:(id<RKObjectLoaderDelegate>)delegate block:(void(^)(RKObjectLoader*))block;
 
 /**
+ POST a remote object instance and yield to a completion or failure block
+ 
+ @see sendObject:method:delegate:block
+ - (RKObjectLoader*)postObject:(id<NSObject>)object completionBlock:(RKObjectCompletionBlock)completion failureBlock:(RKObjectFailureBlock)failure;
+ */
+- (RKObjectLoader*)postObject:(id<NSObject>)object completionBlock:(RKObjectCompletionBlock)completion failureBlock:(RKObjectFailureBlock)failure;
+
+/**
  PUT a remote object instance and yield the object loader to the block before sending
  
  @see sendObject:method:delegate:block
@@ -319,11 +327,27 @@ typedef enum {
 - (RKObjectLoader*)putObject:(id<NSObject>)object delegate:(id<RKObjectLoaderDelegate>)delegate block:(void(^)(RKObjectLoader*))block;
 
 /**
+ PUT a remote object instance and yield to a completion or failure block
+ 
+ @see sendObject:method:delegate:block
+ - (RKObjectLoader*)putObject:(id<NSObject>)object completionBlock:(RKObjectCompletionBlock)completion failureBlock:(RKObjectFailureBlock)failure;
+ */
+- (RKObjectLoader*)putObject:(id<NSObject>)object completionBlock:(RKObjectCompletionBlock)completion failureBlock:(RKObjectFailureBlock)failure;
+
+/**
  DELETE a remote object instance and yield the object loader to the block before sending
  
  @see sendObject:method:delegate:block
  */
 - (RKObjectLoader*)deleteObject:(id<NSObject>)object delegate:(id<RKObjectLoaderDelegate>)delegate block:(void(^)(RKObjectLoader*))block;
+
+/**
+ DELETE a remote object instance and yield to a completion or failure block
+ 
+ @see sendObject:method:delegate:block
+ - (RKObjectLoader*)deleteObject:(id<NSObject>)object completionBlock:(RKObjectCompletionBlock)completion failureBlock:(RKObjectFailureBlock)failure;
+ */
+- (RKObjectLoader*)deleteObject:(id<NSObject>)object completionBlock:(RKObjectCompletionBlock)completion failureBlock:(RKObjectFailureBlock)failure;
 
 #endif
 

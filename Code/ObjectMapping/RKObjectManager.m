@@ -374,4 +374,35 @@ static RKObjectManager* sharedManager = nil;
     return self.client.requestQueue;
 }
 
++ (NSManagedObjectContext *)moc {
+  return [[[self sharedManager] objectStore] managedObjectContext];
+}
+
+- (RKObjectLoader*)postObject:(id<NSObject>)object completionBlock:(RKObjectCompletionBlock)completion failureBlock:(RKObjectFailureBlock)failure {
+	RKObjectLoader* loader = [self objectLoaderForObject:object method:RKRequestMethodPOST delegate:self];
+  loader.targetObject = object;
+  loader.objectCompletionBlock = completion;
+  loader.objectFailureBlock = failure;
+  [loader send];
+  return loader;
+}
+
+- (RKObjectLoader*)putObject:(id<NSObject>)object completionBlock:(RKObjectCompletionBlock)completion failureBlock:(RKObjectFailureBlock)failure {
+	RKObjectLoader* loader = [self objectLoaderForObject:object method:RKRequestMethodPUT delegate:self];
+  loader.targetObject = object;
+  loader.objectCompletionBlock = completion;
+  loader.objectFailureBlock = failure;
+  [loader send];
+  return loader;
+}
+
+- (RKObjectLoader*)deleteObject:(id<NSObject>)object completionBlock:(RKObjectCompletionBlock)completion failureBlock:(RKObjectFailureBlock)failure {
+	RKObjectLoader* loader = [self objectLoaderForObject:object method:RKRequestMethodDELETE delegate:self];
+  loader.targetObject = object;
+  loader.objectCompletionBlock = completion;
+  loader.objectFailureBlock = failure;
+  [loader send];
+  return loader;
+}
+
 @end
