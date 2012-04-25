@@ -651,8 +651,8 @@
                                                         object:self
                                                       userInfo:userInfo];
 
-  if (self->completionBlock != nil && self->delegate == nil) {
-    self->completionBlock(self, finalResponse);
+  if (self->_completionBlock != nil && self->_delegate == nil) {
+    self->_completionBlock(self, finalResponse);
   }
 }
 
