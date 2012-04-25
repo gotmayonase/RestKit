@@ -4,13 +4,13 @@
 //
 //  Created by Jeremy Ellison on 7/27/09.
 //  Copyright 2009 RestKit
-//  
+//
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
 //  You may obtain a copy of the License at
-//  
+//
 //  http://www.apache.org/licenses/LICENSE-2.0
-//  
+//
 //  Unless required by applicable law or agreed to in writing, software
 //  distributed under the License is distributed on an "AS IS" BASIS,
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -97,17 +97,17 @@
 
 - (id)init {
     self = [super init];
-    if (self) {        
+    if (self) {
 #if TARGET_OS_IPHONE
         _backgroundPolicy = RKRequestBackgroundPolicyNone;
-        _backgroundTaskIdentifier = 0; 
+        _backgroundTaskIdentifier = 0;
         BOOL backgroundOK = &UIBackgroundTaskInvalid != NULL;
         if (backgroundOK) {
-            _backgroundTaskIdentifier = UIBackgroundTaskInvalid; 
+            _backgroundTaskIdentifier = UIBackgroundTaskInvalid;
         }
 #endif
     }
-    
+
     return self;
 }
 
@@ -131,7 +131,7 @@
     if (backgroundOK && UIBackgroundTaskInvalid == self.backgroundTaskIdentifier) {
         return;
     }
-    
+
     UIApplication* app = [UIApplication sharedApplication];
     if ([app respondsToSelector:@selector(beginBackgroundTaskWithExpirationHandler:)]) {
     		[app endBackgroundTask:_backgroundTaskIdentifier];
@@ -140,7 +140,7 @@
     #endif
 }
 
-- (void)dealloc {    
+- (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 
     self.delegate = nil;
@@ -161,7 +161,7 @@
     _username = nil;
     [_password release];
     _password = nil;
-    
+
   	self.delegate = nil;
   self.completionBlock = nil;
   self.failureBlock = nil;
@@ -175,7 +175,7 @@
   	[_URLRequest release];
   	_URLRequest = nil;
   	[_params release];
-  	_params = nil;    
+  	_params = nil;
   	[_additionalHTTPHeaders release];
   	_additionalHTTPHeaders = nil;
   	[_username release];
@@ -183,7 +183,7 @@
   	[_password release];
   	_password = nil;
     [_cache release];
-    _cache = nil;    
+    _cache = nil;
     [_OAuth1ConsumerKey release];
     _OAuth1ConsumerKey = nil;
     [_OAuth1ConsumerSecret release];
@@ -199,13 +199,13 @@
     [self invalidateTimeoutTimer];
     [_timeoutTimer release];
     _timeoutTimer = nil;
-    
+
     // Cleanup a background task if there is any
     [self cleanupBackgroundTask];
-  
+
   self.completionBlock = nil;
   self.failureBlock = nil;
-     
+
     [super dealloc];
 }
 
@@ -261,7 +261,7 @@
 	} else {
         [_URLRequest setValue:@"0" forHTTPHeaderField:@"Content-Length"];
     }
-    
+
     // Add authentication headers so we don't have to deal with an extra cycle for each message requiring basic auth.
     if (self.authenticationType == RKRequestAuthenticationTypeHTTPBasic && _username && _password) {
         CFHTTPMessageRef dummyRequest = CFHTTPMessageCreateRequest(kCFAllocatorDefault, (CFStringRef)[self HTTPMethod], (CFURLRef)[self URL], kCFHTTPVersion1_1);
@@ -275,19 +275,19 @@
           CFRelease(dummyRequest);
         }
     }
-    
+
     // Add OAuth headers if is need it
     // OAuth 1
-    if(self.authenticationType == RKRequestAuthenticationTypeOAuth1){        
+    if(self.authenticationType == RKRequestAuthenticationTypeOAuth1){
         NSURLRequest *echo = nil;
-        
+
         // use the suitable parameters dict
         NSDictionary *parameters = nil;
         if ([self.params isKindOfClass:[RKParams class]])
             parameters = [(RKParams *)self.params dictionaryOfPlainTextParams];
-        else 
+        else
             parameters = [_URL queryDictionary];
-            
+
         if (self.method == RKRequestMethodPUT)
             echo = [GCOAuth URLRequestForPath:[_URL path]
                                 PUTParameters:parameters
@@ -319,13 +319,13 @@
         [_URLRequest setValue:[echo valueForHTTPHeaderField:@"Accept-Encoding"] forHTTPHeaderField:@"Accept-Encoding"];
         [_URLRequest setValue:[echo valueForHTTPHeaderField:@"User-Agent"] forHTTPHeaderField:@"User-Agent"];
     }
-    
+
     // OAuth 2 valid request
     if(self.authenticationType == RKRequestAuthenticationTypeOAuth2) {
         NSString *authorizationString = [NSString stringWithFormat:@"OAuth2 %@",self.OAuth2AccessToken];
         [_URLRequest setValue:authorizationString forHTTPHeaderField:@"Authorization"];
     }
-    
+
     if (self.cachePolicy & RKRequestCachePolicyEtag) {
         NSString* etag = [self.cache etagForRequest:self];
         if (etag) {
@@ -339,11 +339,11 @@
 	[_URLRequest setHTTPMethod:[self HTTPMethod]];
 	[self setRequestBody];
 	[self addHeadersToRequest];
-    
+
     NSString* body = [[NSString alloc] initWithData:[_URLRequest HTTPBody] encoding:NSUTF8StringEncoding];
     RKLogTrace(@"Prepared %@ URLRequest '%@'. HTTP Headers: %@. HTTP Body: %@.", [self HTTPMethod], _URLRequest, [_URLRequest allHTTPHeaderFields], body);
     [body release];
-    
+
     return YES;
 }
 
@@ -353,7 +353,7 @@
 	_connection = nil;
     [self invalidateTimeoutTimer];
 	_isLoading = NO;
-    
+
     if (informDelegate && [_delegate respondsToSelector:@selector(requestDidCancelLoad:)]) {
         [_delegate requestDidCancelLoad:self];
     }
@@ -399,17 +399,17 @@
         // TODO: Logging
         return;
     }
-    
-    _isLoading = YES;    
-    
+
+    _isLoading = YES;
+
     if ([self.delegate respondsToSelector:@selector(requestDidStartLoad:)]) {
         [self.delegate requestDidStartLoad:self];
     }
-    
+
     RKResponse* response = [[[RKResponse alloc] initWithRequest:self] autorelease];
-    
+
     _connection = [[NSURLConnection connectionWithRequest:_URLRequest delegate:response] retain];
-    
+
     [[NSNotificationCenter defaultCenter] postNotificationName:RKRequestSentNotification object:self userInfo:nil];
 }
 
@@ -436,13 +436,13 @@
     if (nil == self.reachabilityObserver || NO == [self.reachabilityObserver isReachabilityDetermined]) {
         return YES;
     }
-    
+
     return [self.reachabilityObserver isNetworkReachable];
 }
 
 - (void)sendAsynchronously {
     NSAssert(NO == _isLoading || NO == _isLoaded, @"Cannot send a request that is loading or loaded without resetting it first.");
-    _sentSynchronously = NO;    
+    _sentSynchronously = NO;
     if ([self shouldLoadFromCache]) {
         RKResponse* response = [self loadResponseFromCache];
         _isLoading = YES;
@@ -452,32 +452,32 @@
 #if TARGET_OS_IPHONE
         // Background Request Policy support
         UIApplication* app = [UIApplication sharedApplication];
-        if (self.backgroundPolicy == RKRequestBackgroundPolicyNone || 
+        if (self.backgroundPolicy == RKRequestBackgroundPolicyNone ||
             NO == [app respondsToSelector:@selector(beginBackgroundTaskWithExpirationHandler:)]) {
             // No support for background (iOS 3.x) or the policy is none -- just fire the request
             [self fireAsynchronousRequest];
         } else if (self.backgroundPolicy == RKRequestBackgroundPolicyCancel || self.backgroundPolicy == RKRequestBackgroundPolicyRequeue) {
             // For cancel or requeue behaviors, we watch for background transition notifications
-            [[NSNotificationCenter defaultCenter] addObserver:self 
-                                                     selector:@selector(appDidEnterBackgroundNotification:) 
-                                                         name:UIApplicationDidEnterBackgroundNotification 
+            [[NSNotificationCenter defaultCenter] addObserver:self
+                                                     selector:@selector(appDidEnterBackgroundNotification:)
+                                                         name:UIApplicationDidEnterBackgroundNotification
                                                        object:nil];
             [self fireAsynchronousRequest];
         } else if (self.backgroundPolicy == RKRequestBackgroundPolicyContinue) {
             RKLogInfo(@"Beginning background task to perform processing...");
-            
+
             // Fork a background task for continueing a long-running request
             _backgroundTaskIdentifier = [app beginBackgroundTaskWithExpirationHandler:^{
                 RKLogInfo(@"Background request time expired, canceling request.");
-                
+
                 [self cancelAndInformDelegate:NO];
                 [self cleanupBackgroundTask];
-                
+
                 if ([_delegate respondsToSelector:@selector(requestDidTimeout:)]) {
                     [_delegate requestDidTimeout:self];
                 }
             }];
-            
+
             // Start the potentially long-running request
             [self fireAsynchronousRequest];
         }
@@ -486,7 +486,7 @@
 #endif
 	} else {
         RKLogTrace(@"Declined to dispatch request %@: shared client reported the network is not available.", self);
-        
+
 	    if (_cachePolicy & RKRequestCachePolicyLoadIfOffline &&
 			[self.cache hasResponseForRequest:self]) {
 
@@ -520,7 +520,7 @@
     } else if ([self shouldDispatchRequest]) {
         RKLogDebug(@"Sending synchronous %@ request to URL %@.", [self HTTPMethod], [[self URL] absoluteString]);
         [self createTimeoutTimer];
-        
+
         if (![self prepareURLRequest]) {
             // TODO: Logging
             return nil;
@@ -532,18 +532,18 @@
         if ([self.delegate respondsToSelector:@selector(requestDidStartLoad:)]) {
             [self.delegate requestDidStartLoad:self];
         }
-        
+
 		payload = [NSURLConnection sendSynchronousRequest:_URLRequest returningResponse:&URLResponse error:&error];
 		if (payload != nil) error = nil;
-		
+
 		response = [[[RKResponse alloc] initWithSynchronousRequest:self URLResponse:URLResponse body:payload error:error] autorelease];
-		
+
 		if (payload == nil) {
 			[self didFailLoadWithError:error];
 		} else {
 			[self didFinishLoad:response];
 		}
-        
+
 	} else {
 		if (_cachePolicy & RKRequestCachePolicyLoadIfOffline &&
 			[self.cache hasResponseForRequest:self]) {
@@ -599,14 +599,14 @@
 		if ([_delegate respondsToSelector:@selector(request:didFailLoadWithError:)]) {
 			[_delegate request:self didFailLoadWithError:error];
 		}
-    
+
     if (self.failureBlock != nil && self.delegate == nil) {
       self.failureBlock(self, error);
     }
-        
+
         NSDictionary* userInfo = [NSDictionary dictionaryWithObject:error forKey:RKRequestDidFailWithErrorNotificationUserInfoErrorKey];
-		[[NSNotificationCenter defaultCenter] postNotificationName:RKRequestDidFailWithErrorNotification 
-                                                            object:self 
+		[[NSNotificationCenter defaultCenter] postNotificationName:RKRequestDidFailWithErrorNotification
+                                                            object:self
                                                           userInfo:userInfo];
 	}
 }
@@ -620,7 +620,7 @@
 - (void)didFinishLoad:(RKResponse*)response {
   	_isLoading = NO;
   	_isLoaded = YES;
-    
+
     RKLogInfo(@"Status Code: %ld", (long) [response statusCode]);
     RKLogInfo(@"Body: %@", [response bodyAsString]);
 
@@ -638,21 +638,21 @@
 	if ([_delegate respondsToSelector:@selector(request:didLoadResponse:)]) {
 		[_delegate request:self didLoadResponse:finalResponse];
 	}
-    
+
     if ([response isServiceUnavailable]) {
         [[NSNotificationCenter defaultCenter] postNotificationName:RKServiceDidBecomeUnavailableNotification object:self];
     }
-    
+
     // NOTE: This notification must be posted last as the request queue releases the request when it
     // receives the notification
-    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:finalResponse 
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:finalResponse
                                                          forKey:RKRequestDidLoadResponseNotificationUserInfoResponseKey];
-    [[NSNotificationCenter defaultCenter] postNotificationName:RKRequestDidLoadResponseNotification 
-                                                        object:self 
+    [[NSNotificationCenter defaultCenter] postNotificationName:RKRequestDidLoadResponseNotification
+                                                        object:self
                                                       userInfo:userInfo];
-  
-  if (self.completionBlock != nil && self.delegate == nil) {
-    self.completionBlock(self, finalResponse);
+
+  if (self->completionBlock != nil && self->delegate == nil) {
+    self->completionBlock(self, finalResponse);
   }
 }
 
@@ -734,7 +734,7 @@
     if (_method == RKRequestMethodDELETE) {
         return NO;
     }
-    
+
     return YES;
 }
 
@@ -742,7 +742,7 @@
     if (! [self isCacheable]) {
         return nil;
     }
-    
+
     // Use [_params HTTPBody] because the URLRequest body may not have been set up yet.
     NSString* compositeCacheKey = nil;
     if (_params) {
